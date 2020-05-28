@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WP REST API JS</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+    <header class="hero is-primary">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title is-size-1 has-text-centered">oCooking</h1>
+            </div>
+        </div>
+    </header>
+    <main class="section">
+        <div class="container">
+            <h2 class="title is-size-2">Liste des recettes</h2>
+            <div class="buttons">
+                <button class="button is-large is-link addRecipe">Ajouter une recette</button>
+            </div>
+            <table class="table is-striped is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="recipe-list">
+
+                </tbody>
+                <tfoot class="is-hidden loadNextRecipeListContainer">
+                    <tr>
+                        <td class="has-text-centered" colspan="2">
+                            <button type="button" class="button is-light is-large loadNextRecipeList">Charger la suite</button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="buttons">
+                <button class="button is-large is-link addRecipe">Ajouter une recette</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="overlay is-hidden">
+        <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+    </div>
+
+    <div class="modal loginModal">
+        <form class="form loginForm">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <span class="modal-card-title">Se connecter</span>
+                </header>
+                <section class="modal-card-body">
+                        <div class="notifications"></div>
+                        <div class="field">
+                            <p class="control has-icons-left">
+                                <input name="username" class="input is-large" type="text" placeholder="Identifiant">
+                                <span class="icon is-small is-left">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control has-icons-left">
+                                <input name="password" class="input is-large" type="password" placeholder="Mot de passe">
+                                <span class="icon is-small is-left">
+                                    <i class="fa fa-lock"></i>
+                                </span>
+                            </p>
+                        </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button type="submit" class="button is-success is-large submitLoginForm" aria-label="close"><span class="icon"><i class="fa fa-sign-in"></i></span><span>Se connecter</span></button>
+                </footer>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal seeRecipeModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <span class="modal-card-title">Détails de la recette</span>
+                <button class="delete is-large closeModal" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="title is-1 recipeTitle"></div>
+                <div class="card-content">
+                    <div class="content recipeContent"></div>
+                    <div class="list">
+                        <div class="list-item">Temps de préparation : <span class="recipePreparationTime"></span> min.</div>
+                        <div class="list-item">Temps de cuisson : <span class="recipeCookingTime"></span> min.</div>
+                        <div class="list-item">Coût par personne : <span class="recipeCostPerPerson"></span> € / pers.</div>
+                    </div>
+                </div>
+                <div class="card-image">
+                    <figure class="image">
+                        <img class="recipeImage" src="" alt="Recipe image">
+                    </figure>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-large closeModal" aria-label="close"><span class="icon"><i class="fa fa-close"></i></span><span>Fermer</span></button>
+                <button class="button is-warning is-large editRecipe"><span class="icon"><i class="fa fa-edit"></i></span><span>Éditer</span></button>
+                <button class="button is-large is-danger deleteRecipe"><span class="icon"><i class="fa fa-trash"></i></span><span>Supprimer</span></button>
+            </footer>
+        </div>
+    </div>
+
+    <div class="modal editRecipeModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <span class="modal-card-title">Éditer une recette</span>
+            </header>
+            <section class="modal-card-body">
+                <form class="form">
+                    <input type="hidden" name="id">
+                    <div class="field">
+                        <label for="edit-title" class="label is-large">Titre</label>
+                        <p class="control">
+                            <input id="edit-title" class="input is-large" type="text" name="title">
+                        </p>
+                    </div>
+                    <div class="field">
+                        <label for="edit-content" class="label is-large">Étapes</label>
+                        <p class="control">
+                            <textarea id="edit-content" class="textarea is-large" name="content"></textarea>
+                        </p>
+                    </div>
+                    <label for="edit-preparation-time" class="label is-large">Temps de préparation</label>
+                    <div class="field has-addons">
+                        <p class="control">
+                            <input id="edit-preparation-time" class="input is-large" type="number" name="preparation-time">
+                        </p>
+                        <p class="control">
+                            <a class="button is-large is-static">min.</a>
+                        </p>
+                    </div>
+                    <label for="edit-cooking-time" class="label is-large">Temps de cuisson</label>
+                    <div class="field has-addons">
+                        <p class="control">
+                            <input id="edit-cooking-time" class="input is-large" type="number" name="cooking-time">
+                        </p>
+                        <p class="control">
+                            <a class="button is-large is-static">min.</a>
+                        </p>
+                    </div>
+                    <label for="edit-cost-per-person" class="label is-large">Coût par personne</label>
+                    <div class="field has-addons">
+                        <p class="control">
+                            <input id="edit-cost-per-person" class="input is-large" type="number" name="cost-per-person">
+                        </p>
+                        <p class="control">
+                            <a class="button is-large is-static">€ / pers.</a>
+                        </p>
+                    </div>
+                </form>
+            </section>
+            <footer class="modal-card-foot">
+                <button type="button" class="button is-success is-large submitEditRecipeForm"><span class="icon"><i class="fa fa-edit"></i></span><span>Modifier</span></button>
+                <button type="button" class="button is-large closeModal"><span class="icon"><i class="fa fa-close"></i></span><span>Annuler</span></button>
+            </footer>
+        </div>
+    </div>
+
+    <div class="modal createRecipeModal">
+        <form class="form createRecipeForm">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <span class="modal-card-title">Créer une recette</span>
+                </header>
+                <section class="modal-card-body">
+                        <div class="notifications"></div>
+                        <div class="field">
+                            <label for="title" class="label is-large">Titre</label>
+                            <p class="control">
+                                <input id="title" class="input is-large" type="text" name="title">
+                            </p>
+                        </div>
+                        <div class="field">
+                            <label for="content" class="label is-large">Étapes</label>
+                            <p class="control">
+                                <textarea id="content" class="textarea is-large" name="content"></textarea>
+                            </p>
+                        </div>
+                        <label for="preparation-time" class="label is-large">Temps de préparation</label>
+                        <div class="field has-addons">
+                            <p class="control">
+                                <input id="preparation-time" class="input is-large" type="number" name="preparation-time">
+                            </p>
+                            <p class="control">
+                                <a class="button is-large is-static">min.</a>
+                            </p>
+                        </div>
+                        <label for="cooking-time" class="label is-large">Temps de cuisson</label>
+                        <div class="field has-addons">
+                            <p class="control">
+                                <input id="cooking-time" class="input is-large" type="number" name="cooking-time">
+                            </p>
+                            <p class="control">
+                                <a class="button is-large is-static">min.</a>
+                            </p>
+                        </div>
+                        <label for="cost-per-person" class="label is-large">Coût par personne</label>
+                        <div class="field has-addons">
+                            <p class="control">
+                                <input id="cost-per-person" class="input is-large" type="number" name="cost-per-person">
+                            </p>
+                            <p class="control">
+                                <a class="button is-large is-static">€ / pers.</a>
+                            </p>
+                        </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button type="submit" class="button is-success is-large submitCreateRecipeForm"><span class="icon"><i class="fa fa-check"></i></span><span>Créer</span></button>
+                    <button class="button is-large closeModal"><span class="icon"><i class="fa fa-close"></i></span><span>Annuler</span></button>
+                </footer>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal deleteRecipeConfirmationModal">
+        <form class="deleteRecipeConfirmationForm">
+            <input class="recipeId" type="hidden" name="recipe-id" value="">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <span class="modal-card-title">Supprimer la recette &laquo;&nbsp;<span class="recipeTitle"></span>&nbsp;&raquo;&nbsp;?</span>
+                </header>
+                <footer class="modal-card-foot">
+                    <button type="submit" class="button is-danger is-large deleteRecipe"><span class="icon"><i class="fa fa-trash"></i></span><span>Supprimer</span></button>
+                    <button type="button" class="button is-large closeModal" aria-label="close"><span class="icon"><i class="fa fa-close"></i></span><span>Annuler</span></button>
+                </footer>
+            </div>
+        </form>
+    </div>
+
+    <template id="recipe-list-item-template">
+        <tr class="recipe">
+            <td class="recipeTitle"></td>
+            <td>
+                <div class="buttons">
+                    <button class="button is-success is-large showRecipe"><span class="icon"><i class="fa fa-eye"></i></span><span>Voir</span></button>
+                    <button class="button is-warning is-large editRecipe"><span class="icon"><i class="fa fa-edit"></i></span><span>Éditer</span></button>
+                    <button class="button is-large is-danger deleteRecipe"><span class="icon"><i class="fa fa-trash"></i></span><span>Supprimer</span></button>
+                </div>
+            </td>
+        </tr>
+    </template>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
